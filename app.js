@@ -24,7 +24,7 @@ cloudinary.config({
   secure: true,
 });
 
-app.use(morgan("tiny"));
+// app.use(morgan("tiny"));
 
 // import routes here
 const signupRoute = require("./routes/signupRoute");

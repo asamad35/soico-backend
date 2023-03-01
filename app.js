@@ -18,7 +18,6 @@ app.use(
 );
 app.use(passport.initialize());
 app.use(passport.session());
-
 // middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -27,7 +26,7 @@ app.use(
     origin:
       process.env.PROD === "false"
         ? "http://localhost:5173"
-        : "https://socio-plus.netlify.app/login",
+        : "https://socio-plus.netlify.app",
     credentials: true,
   })
 );

@@ -14,7 +14,6 @@ const io = new Server(server, {
       process.env.PROD === "false"
         ? "http://localhost:5173"
         : "https://socio-plus.netlify.app",
-    // origin: "https://socio-plus.netlify.app",
     methods: ["GET", "POST"],
   },
 });

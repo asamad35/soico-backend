@@ -1,6 +1,7 @@
 const bigPromise = require("../middlewares/bigPromise");
 const UserSchema = require("../models/userModel");
 const cloudinary = require("cloudinary").v2;
+const passport = require("passport");
 
 exports.signup = bigPromise(async (req, res, next) => {
   const { firstName, lastName, email, password, confirmPassword } = req.body;
@@ -34,11 +35,26 @@ exports.login = bigPromise(async (req, res, next) => {
 
   if (!isPasswordValid) throw Error("Password does not match.");
 
-  const sleep = (ms) =>
-    new Promise((resolve) => setTimeout(() => resolve(), ms));
+  // const sleep = (ms) =>
+  //   new Promise((resolve) => setTimeout(() => resolve(), ms));
 
   // await sleep(2000);
   // throw Error();
+
+  res.status(200).json({
+    data: user,
+    token: user.getJwtToken(),
+    message: "Login successful",
+  });
+});
+
+exports.loginWithGoogle = bigPromise(async (req, res, next) => {
+  if (!req.isAuthenticated || !req.user) {
+    res.sendStatus(200);
+    return;
+  }
+  const user = await UserSchema.findOne({ email: req?.user?.emails[0]?.value });
+
   res.status(200).json({
     data: user,
     token: user.getJwtToken(),

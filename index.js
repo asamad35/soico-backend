@@ -1,17 +1,17 @@
 require("dotenv").config();
 const app = require("./app");
 const connectWithDb = require("./config");
-
 connectWithDb();
 
+// socket
 const http = require("http");
 const server = http.createServer(app);
 const { Server } = require("socket.io");
 const { updateLatestMessage } = require("./controllers/chatController");
 const io = new Server(server, {
   cors: {
-    // origin: "http://localhost:5173",
-    origin: "https://socio-plus.netlify.app",
+    origin: "http://localhost:5173",
+    // origin: "https://socio-plus.netlify.app",
     methods: ["GET", "POST"],
   },
 });

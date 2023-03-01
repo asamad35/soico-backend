@@ -40,6 +40,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: "https://static.thenounproject.com/png/3465604-200.png",
   },
+  loggedInWithThirdParty: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 // hash pass before save

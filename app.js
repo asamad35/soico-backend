@@ -25,8 +25,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({
     origin:
-      // "http://localhost:5173"
-      "https://socio-plus.netlify.app/login",
+      process.env.PROD === "false"
+        ? "http://localhost:5173"
+        : "https://socio-plus.netlify.app/login",
     credentials: true,
   })
 );
@@ -62,10 +63,16 @@ app.get(
 app.get(
   "/auth/google/callback",
   passport.authenticate("google", {
-    // successRedirect: "http://localhost:5173/login",
-    // failureRedirect: "http://localhost:5173/login",
-    successRedirect: "https://socio-plus.netlify.app/login",
-    failureRedirect: "https://socio-plus.netlify.app/login",
+    successRedirect:
+      process.env.PROD === "false"
+        ? "http://localhost:5173/login"
+        : "https://socio-plus.netlify.app/login",
+    failureRedirect:
+      process.env.PROD === "false"
+        ? "http://localhost:5173/login"
+        : "https://socio-plus.netlify.app/login",
+    // successRedirect: "https://socio-plus.netlify.app/login",
+    // failureRedirect: "https://socio-plus.netlify.app/login",
   })
 );
 

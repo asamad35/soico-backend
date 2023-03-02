@@ -48,19 +48,18 @@ exports.login = bigPromise(async (req, res, next) => {
 });
 
 exports.loginWithGoogle = bigPromise(async (req, res, next) => {
-  const { firstName, lastName, email, photoUrl, loggedInWithThirdParty } =
-    req.body;
+  const { firstName, lastName, email, photoUrl } = req.body;
 
   let user = await UserSchema.findOne({ email });
 
   if (!user)
     user = await UserSchema.create({
-      firstName: profile?.name?.givenName,
-      lastName: profile?.name?.familyName,
-      email: profile?.emails[0]?.value,
+      firstName,
+      lastName,
+      email,
       password: process.env.THIRD_PARTY_PASS,
       confirmPassword: process.env.THIRD_PARTY_PASS,
-      photoUrl: profile?.photos[0]?.value,
+      photoUrl,
       loggedInWithThirdParty: true,
     });
 

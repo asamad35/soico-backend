@@ -6,8 +6,6 @@ const morgan = require("morgan");
 const fileUpload = require("express-fileupload");
 const cors = require("cors");
 const cloudinary = require("cloudinary").v2;
-const passport = require("passport");
-require("./passport/passport");
 
 app.use(
   session({
@@ -16,8 +14,6 @@ app.use(
     saveUninitialized: true,
   })
 );
-app.use(passport.initialize());
-app.use(passport.session());
 // middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -51,43 +47,8 @@ const signupRoute = require("./routes/signupRoute");
 const editProfileRoute = require("./routes/editProfileRoute");
 const chatRoute = require("./routes/chatRoute");
 const messageRoute = require("./routes/messageRoute");
-const { loginWithGoogle } = require("./controllers/userController");
+
 // route middleware
-
-app.get(
-  "/api/v1/login-with-google",
-  passport.authenticate("google", { scope: ["profile", "email"] })
-);
-
-app.get(
-  "/auth/google/callback",
-  passport.authenticate("google", {
-    successRedirect:
-      process.env.PROD === "false"
-        ? "http://localhost:5173/"
-        : "https://socio-plus.netlify.app/",
-    failureRedirect:
-      process.env.PROD === "false"
-        ? "http://localhost:5173/"
-        : "https://socio-plus.netlify.app/",
-    // successRedirect: "https://socio-plus.netlify.app/login",
-    // failureRedirect: "https://socio-plus.netlify.app/login",
-  })
-);
-
-app.get("/api/v1/google-success", (req, res) => {
-  console.log(req.user, "nnnnnnnnnnnnnnnnnnnnnnnnnnn");
-
-  loginWithGoogle(req, res);
-});
-app.post("/api/v1/google-logout", (req, res, next) => {
-  console.log(req.user, "abcbdbcdbc");
-  req.logout(function (err) {
-    if (err) next(err);
-    res.json({ data: "successful", message: "logout successful" });
-  });
-});
-
 app.use("/api/v1", signupRoute);
 app.use("/api/v1", editProfileRoute);
 app.use("/api/v1/chat", chatRoute);

@@ -1,7 +1,6 @@
 const bigPromise = require("../middlewares/bigPromise");
 const UserSchema = require("../models/userModel");
 const cloudinary = require("cloudinary").v2;
-const passport = require("passport");
 
 exports.signup = bigPromise(async (req, res, next) => {
   const { firstName, lastName, email, password, confirmPassword } = req.body;
@@ -49,11 +48,21 @@ exports.login = bigPromise(async (req, res, next) => {
 });
 
 exports.loginWithGoogle = bigPromise(async (req, res, next) => {
-  if (!req.isAuthenticated || !req.user) {
-    res.sendStatus(200);
-    return;
-  }
-  const user = await UserSchema.findOne({ email: req?.user?.emails[0]?.value });
+  const { firstName, lastName, email, photoUrl, loggedInWithThirdParty } =
+    req.body;
+
+  let user = await UserSchema.findOne({ email });
+
+  if (!user)
+    user = await UserSchema.create({
+      firstName: profile?.name?.givenName,
+      lastName: profile?.name?.familyName,
+      email: profile?.emails[0]?.value,
+      password: process.env.THIRD_PARTY_PASS,
+      confirmPassword: process.env.THIRD_PARTY_PASS,
+      photoUrl: profile?.photos[0]?.value,
+      loggedInWithThirdParty: true,
+    });
 
   res.status(200).json({
     data: user,

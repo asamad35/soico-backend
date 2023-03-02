@@ -76,7 +76,7 @@ app.get(
 );
 
 app.get("/api/v1/google-success", (req, res) => {
-  // console.log(req.user, "nnnnnnnnnnnnnnnnnnnnnnnnnnn");
+  console.log(req.user, "nnnnnnnnnnnnnnnnnnnnnnnnnnn");
 
   loginWithGoogle(req, res);
 });

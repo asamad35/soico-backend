@@ -64,12 +64,12 @@ app.get(
   passport.authenticate("google", {
     successRedirect:
       process.env.PROD === "false"
-        ? "http://localhost:5173/login"
-        : "https://socio-plus.netlify.app/login",
+        ? "http://localhost:5173/"
+        : "https://socio-plus.netlify.app/",
     failureRedirect:
       process.env.PROD === "false"
-        ? "http://localhost:5173/login"
-        : "https://socio-plus.netlify.app/login",
+        ? "http://localhost:5173/"
+        : "https://socio-plus.netlify.app/",
     // successRedirect: "https://socio-plus.netlify.app/login",
     // failureRedirect: "https://socio-plus.netlify.app/login",
   })

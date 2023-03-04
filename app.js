@@ -3,7 +3,7 @@ const express = require("express");
 const session = require("express-session");
 const app = express();
 const morgan = require("morgan");
-const fileUpload = require("express-fileupload");
+// const fileUpload = require("express-fileupload");
 const cors = require("cors");
 const cloudinary = require("cloudinary").v2;
 
@@ -26,12 +26,12 @@ app.use(
     credentials: true,
   })
 );
-app.use(
-  fileUpload({
-    useTempFiles: true,
-    tempFileDir: "/tmp/",
-  })
-);
+// app.use(
+//   fileUpload({
+//     useTempFiles: true,
+//     tempFileDir: "/tmp/",
+//   })
+// );
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,

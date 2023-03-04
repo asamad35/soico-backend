@@ -14,6 +14,9 @@ const messageSchema = mongoose.Schema(
       type: String,
       trim: true,
     },
+    files: {
+      type: Array,
+    },
   },
   { timestamps: true }
 );

@@ -1,4 +1,5 @@
 const bigPromise = require("../middlewares/bigPromise");
+const { getDataUri } = require("../middlewares/multerSingleUpload");
 const UserSchema = require("../models/userModel");
 const cloudinary = require("cloudinary").v2;
 
@@ -122,17 +123,13 @@ exports.allUsers = bigPromise(async (req, res, next) => {
 });
 
 exports.updatePhoto = bigPromise(async (req, res, next) => {
-  console.log("i am running", req.files, req.body);
-
-  if (!req.files) {
+  const fileUri = getDataUri(req.file);
+    if (!req.file) {
     throw new Error("No photo found");
   }
-  const uploadedData = await cloudinary.uploader.upload(
-    req.files.profilePic.tempFilePath,
-    {
-      folder: "chatApp",
-    }
-  );
+  const uploadedData = await cloudinary.uploader.upload(fileUri.content, {
+    folder: "chatApp",
+  });
 
   const user = await UserSchema.findOne({ email: req.user.email });
   user.photoUrl = uploadedData.secure_url;

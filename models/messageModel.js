@@ -15,7 +15,14 @@ const messageSchema = mongoose.Schema(
       trim: true,
     },
     files: {
-      type: Array,
+      type: [
+        {
+          isImage: { type: Boolean, default: false, require: true },
+          name: { type: String, require: true },
+          url: { type: String, unique: true, require: true },
+        },
+      ],
+      default: [],
     },
   },
   { timestamps: true }

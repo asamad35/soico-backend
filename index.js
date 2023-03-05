@@ -43,7 +43,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("newMessage", (message) => {
-    // console.log({ message });
+    console.log({ message });
     updateLatestMessage({ onlineUsers, message, socket, io });
     socket.to(message.chat).emit("updateMessages", message);
   });

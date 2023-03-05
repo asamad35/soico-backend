@@ -2,6 +2,19 @@ const bigPromise = require("../middlewares/bigPromise");
 const messageSchema = require("../models/messageModel");
 const chatSchema = require("../models/chatModel");
 
+const grid = require("gridfs-stream");
+const mongoose = require("mongoose");
+
+let gfs, gridfsBucket;
+const conn = mongoose.connection;
+conn.once("open", () => {
+  gridfsBucket = new mongoose.mongo.GridFSBucket(conn.db, {
+    bucketName: "docsss",
+  });
+  gfs = grid(conn.db, mongoose.mongo);
+  gfs.collection("docsss");
+});
+
 exports.sendMessage = bigPromise(async (req, res) => {
   const { content, chatID } = req.body;
   console.log(req.files, "kkkkkkkkkkkkkkkkkkkaaaakkkkkkkkk");
@@ -11,7 +24,19 @@ exports.sendMessage = bigPromise(async (req, res) => {
 
   let filesName;
 
-  if (req.files) filesName = req.files.map((el) => el.filename);
+  if (req.files)
+    filesName = req.files.map((el) => {
+      return {
+        name: el.originalname,
+        url:
+          (process.env.PROD === "false"
+            ? process.env.LOCAL_SERVER_URL
+            : process.env.REMOTE_SERVER_URL) +
+          "message/get-file/" +
+          el.filename,
+        isImage: el.contentType.includes("image"),
+      };
+    });
 
   const messageObj = {
     content,
@@ -26,6 +51,12 @@ exports.sendMessage = bigPromise(async (req, res) => {
 
   await chatSchema.findByIdAndUpdate(chatID, { latestMessage: message });
   res.json({ data: message });
+});
+
+exports.uploadDocMessage = bigPromise(async (req, res) => {
+  const file = await gfs.files.findOne({ filename: req.params.filename });
+  const readStream = gridfsBucket.openDownloadStream(file._id);
+  readStream.pipe(res);
 });
 
 exports.fetchAllMessages = bigPromise(async (req, res) => {

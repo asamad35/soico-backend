@@ -17,9 +17,9 @@ const messageSchema = mongoose.Schema(
     files: {
       type: [
         {
-          isImage: { type: Boolean, default: false, require: true },
-          name: { type: String, require: true },
-          url: { type: String, unique: true, require: true },
+          isImage: { type: Boolean, default: false },
+          name: { type: String },
+          url: { type: String },
         },
       ],
       default: [],

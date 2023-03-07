@@ -1,6 +1,7 @@
 const bigPromise = require("../middlewares/bigPromise");
 const messageSchema = require("../models/messageModel");
 const chatSchema = require("../models/chatModel");
+var crypto = require("crypto");
 
 const grid = require("gridfs-stream");
 const mongoose = require("mongoose");
@@ -16,8 +17,7 @@ conn.once("open", () => {
 });
 
 exports.sendMessage = bigPromise(async (req, res) => {
-  const { content, chatID } = req.body;
-  console.log(req.files, "kkkkkkkkkkkkkkkkkkkaaaakkkkkkkkk");
+  let { content, chatID, uuid, uuids } = req.body;
 
   if (!content && !req.files) throw new Error("Cannot send empty message");
   if (!chatID) throw new Error("Chat ID not found");
@@ -25,9 +25,11 @@ exports.sendMessage = bigPromise(async (req, res) => {
   let filesName;
 
   if (req.files)
-    filesName = req.files.map((el) => {
+    filesName = req.files.map((el, idx) => {
+      console.log(uuids.split(",")[idx], "lllllllllllllssss");
       return {
         name: el.originalname,
+        uuid: uuids.split(",")[idx],
         url:
           (process.env.PROD === "false"
             ? process.env.LOCAL_SERVER_URL
@@ -42,6 +44,7 @@ exports.sendMessage = bigPromise(async (req, res) => {
     content,
     sender: req.user._id,
     chat: chatID,
+    uuid: uuid,
   };
   if (filesName) {
     messageObj.files = filesName;

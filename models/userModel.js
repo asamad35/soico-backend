@@ -7,17 +7,17 @@ const validator = require("validator");
 const userSchema = new mongoose.Schema({
   firstName: {
     type: String,
-    require: [true, "First Name is a required field"],
+    required: [true, "First Name is a required field"],
     maxlength: [10, "First Name should be less than 10 characters"],
   },
   lastName: {
     type: String,
-    require: [true, "Last Name is a required field"],
+    required: [true, "Last Name is a required field"],
     maxlength: [10, "Last Name should be less than 10 characters"],
   },
   email: {
     type: String,
-    require: [true, "Email is a required field"],
+    required: [true, "Email is a required field"],
     unique: true,
     validate: {
       validator: function (email) {
@@ -28,7 +28,7 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    require: [true, "Password is a required field"],
+    required: [true, "Password is a required field"],
     minlength: [6, "Password should be atleast 6 characters long"],
     select: false,
   },

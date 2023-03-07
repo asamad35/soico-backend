@@ -20,9 +20,14 @@ const messageSchema = mongoose.Schema(
           isImage: { type: Boolean, default: false },
           name: { type: String },
           url: { type: String },
+          uuid: { type: String, required: true },
         },
       ],
       default: [],
+    },
+    uuid: {
+      type: String,
+      required: true,
     },
   },
   { timestamps: true }

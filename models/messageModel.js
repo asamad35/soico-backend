@@ -14,12 +14,25 @@ const messageSchema = mongoose.Schema(
       type: String,
       trim: true,
     },
+    replyMessage: {
+      uuid: String,
+      content: String,
+      sendOrReceived: String,
+      senderName: String,
+
+      image: Boolean,
+      parentUuid: String,
+      docName: String,
+      compressedImageBase64: String,
+      isImageLocal: String,
+    },
     files: {
       type: [
         {
           isImage: { type: Boolean, default: false },
           name: { type: String },
           url: { type: String },
+          compressedImageBase64: { type: String },
           uuid: { type: String, required: true },
         },
       ],

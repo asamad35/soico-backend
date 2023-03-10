@@ -17,7 +17,10 @@ conn.once("open", () => {
 });
 
 exports.sendMessage = bigPromise(async (req, res) => {
-  let { content, chatID, uuid, uuids } = req.body;
+  let { content, chatID, uuid, uuids, replyMessage, compressedImageArr } =
+    req.body;
+
+  console.log(compressedImageArr, "dqqqqqqqqqqqqqqqqqq");
 
   if (!content && !req.files) throw new Error("Cannot send empty message");
   if (!chatID) throw new Error("Chat ID not found");
@@ -26,7 +29,7 @@ exports.sendMessage = bigPromise(async (req, res) => {
 
   if (req.files)
     filesName = req.files.map((el, idx) => {
-      console.log(uuids.split(",")[idx], "lllllllllllllssss");
+      console.log(el, "lllllllllllllssss");
       return {
         name: el.originalname,
         uuid: uuids.split(",")[idx],
@@ -36,6 +39,10 @@ exports.sendMessage = bigPromise(async (req, res) => {
             : process.env.REMOTE_SERVER_URL) +
           "message/get-file/" +
           el.filename,
+        compressedImageBase64:
+          idx === 0
+            ? compressedImageArr.split(",data:image/")[idx]
+            : "data:image/" + compressedImageArr.split(",data:image/")[idx],
         isImage: el.contentType.includes("image"),
       };
     });
@@ -46,6 +53,9 @@ exports.sendMessage = bigPromise(async (req, res) => {
     chat: chatID,
     uuid: uuid,
   };
+  if (replyMessage.uuid) {
+    messageObj.replyMessage = replyMessage;
+  }
   if (filesName) {
     messageObj.files = filesName;
   }

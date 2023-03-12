@@ -23,7 +23,7 @@ const messageSchema = mongoose.Schema(
       image: Boolean,
       parentUuid: String,
       docName: String,
-      compressedImageBase64: String,
+      url: String,
       isImageLocal: String,
     },
     files: {

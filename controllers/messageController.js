@@ -66,7 +66,6 @@ exports.uploadDocMessage = bigPromise(async (req, res) => {
 
 exports.fetchAllMessages = bigPromise(async (req, res) => {
   const { chatID } = req.body;
-  console.log({ chatID });
 
   // update unread mssg count to 0 if unread user matches with the logged user
   const chat = await chatSchema.findOne({ _id: chatID });

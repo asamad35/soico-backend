@@ -31,7 +31,7 @@ io.on("connection", (socket) => {
   socket.on("new-user", (user) => {
     onlineUsers.push({ ...user, socketID: socket.id });
     // console.log({ userId, socketID: socket.id });
-    io.emit("onlinUsersList", onlineUsers);
+    io.emit("onlineUsersList", onlineUsers);
   });
 
   // user joining room based on chat id
@@ -70,7 +70,7 @@ io.on("connection", (socket) => {
       return el.socketID !== socket.id;
     });
     // console.log({ onlineUsers });
-    io.emit("onlinUsersList", onlineUsers);
+    io.emit("onlineUsersList", onlineUsers);
 
     console.log("socket disconnected");
   });

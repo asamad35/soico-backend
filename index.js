@@ -56,11 +56,12 @@ io.on("connection", (socket) => {
   socket.on("callEnded", (partnerDetails) => {
     const otherUser = partnerDetails.from ?? partnerDetails;
 
-    console.log(otherUser);
+    console.log(otherUser, "working backend call ended");
     const otherUserSocketId = onlineUsers.find(
       (el) => el._id === otherUser._id
     ).socketID;
     io.to(otherUserSocketId).emit("callEnded");
+    io.to(otherUserSocketId).emit("removeCallAccept");
   });
 
   // add user to list of online users

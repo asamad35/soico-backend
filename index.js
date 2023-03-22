@@ -27,6 +27,42 @@ let onlineUsers = [];
 io.on("connection", (socket) => {
   console.log("a user connected", { socketID: socket.id });
 
+  // - calling
+
+  socket.on("sendOffer", ({ userToCall, offer, from, selectedChat }) => {
+    const otherUserSocketId = onlineUsers.find(
+      (el) => el._id === userToCall._id
+    ).socketID;
+
+    io.to(otherUserSocketId).emit("incomingOffer", {
+      offer,
+      from,
+      selectedChat,
+    });
+  });
+
+  socket.on("callAccepted", ({ answer, to }) => {
+    const callerSocketId = onlineUsers.find((el) => el._id === to._id).socketID;
+    io.to(callerSocketId).emit("offerAccepted", { answer });
+  });
+
+  socket.on("ice-candidate", (incoming) => {
+    const otherUserSocketId = onlineUsers.find(
+      (el) => el._id === incoming.target._id
+    ).socketID;
+    io.to(otherUserSocketId).emit("ice-candidate", incoming.candidate);
+  });
+
+  socket.on("callEnded", (partnerDetails) => {
+    const otherUser = partnerDetails.from ?? partnerDetails;
+
+    console.log(otherUser);
+    const otherUserSocketId = onlineUsers.find(
+      (el) => el._id === otherUser._id
+    ).socketID;
+    io.to(otherUserSocketId).emit("callEnded");
+  });
+
   // add user to list of online users
   socket.on("new-user", (user) => {
     onlineUsers.push({ ...user, socketID: socket.id });

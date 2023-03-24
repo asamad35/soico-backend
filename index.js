@@ -29,39 +29,23 @@ io.on("connection", (socket) => {
 
   // - calling
 
-  socket.on("sendOffer", ({ userToCall, offer, from, selectedChat }) => {
-    const otherUserSocketId = onlineUsers.find(
-      (el) => el._id === userToCall._id
-    ).socketID;
+  socket.on("callInvitation", ({ selectedChatId, from, to }) => {
+    const targetUser = onlineUsers.find((el) => el._id === to._id);
 
-    io.to(otherUserSocketId).emit("incomingOffer", {
-      offer,
+    if (!targetUser) return;
+
+    io.to(targetUser.socketID).emit("callInvitation", {
+      selectedChatId,
       from,
-      selectedChat,
+      to,
     });
   });
 
-  socket.on("callAccepted", ({ answer, to }) => {
-    const callerSocketId = onlineUsers.find((el) => el._id === to._id).socketID;
-    io.to(callerSocketId).emit("offerAccepted", { answer });
-  });
+  socket.on("callEnded", ({ from, to }) => {
+    const targetUser = onlineUsers.find((el) => el._id === to._id);
+    if (!targetUser) return;
 
-  socket.on("ice-candidate", (incoming) => {
-    const otherUserSocketId = onlineUsers.find(
-      (el) => el._id === incoming.target._id
-    ).socketID;
-    io.to(otherUserSocketId).emit("ice-candidate", incoming.candidate);
-  });
-
-  socket.on("callEnded", (partnerDetails) => {
-    const otherUser = partnerDetails.from ?? partnerDetails;
-
-    console.log(otherUser, "working backend call ended");
-    const otherUserSocketId = onlineUsers.find(
-      (el) => el._id === otherUser._id
-    ).socketID;
-    io.to(otherUserSocketId).emit("callEnded");
-    io.to(otherUserSocketId).emit("removeCallAccept");
+    io.to(targetUser.socketID).emit("callEnded", { from, to });
   });
 
   // add user to list of online users

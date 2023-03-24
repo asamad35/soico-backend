@@ -31,9 +31,43 @@ io.on("connection", (socket) => {
 
   socket.on("callInvitation", ({ selectedChatId, from, to }) => {
     const targetUser = onlineUsers.find((el) => el._id === to._id);
+    const userWhoCalled = onlineUsers.find((el) => el._id === from._id);
 
-    if (!targetUser) return;
+    // do not connect if user is offline
+    if (!targetUser) {
+      io.to(userWhoCalled.socketID).emit("cantConnect", {
+        calledUser: to,
+        message: "is offline.",
+      });
+      return;
+    }
 
+    // do not connect if user is busy
+    if (targetUser.inChat) {
+      io.to(userWhoCalled.socketID).emit("leaveChannel");
+      io.to(userWhoCalled.socketID).emit("cantConnect", {
+        calledUser: to,
+        message: "is busy.",
+      });
+      return;
+    }
+
+    // join call for userWhoCalled
+    io.to(userWhoCalled.socketID).emit("canConnect");
+
+    // set userWhoCalled to busy state
+    onlineUsers.forEach((user) => {
+      const condition = userWhoCalled._id === user._id;
+      if (condition) {
+        user.inChat = true;
+      }
+    });
+
+    console.log(onlineUsers, "user who called");
+
+    console.log("target User", { selectedChatId, from, to });
+
+    // send invitation to target user
     io.to(targetUser.socketID).emit("callInvitation", {
       selectedChatId,
       from,
@@ -41,16 +75,76 @@ io.on("connection", (socket) => {
     });
   });
 
+  socket.on("callAccepted", ({ from, to }) => {
+    console.log([from, to], "array");
+
+    // setting both users to busy state
+    const bothUsers = onlineUsers.filter((user) =>
+      [from, to].some((obj) => obj._id === user._id)
+    );
+
+    onlineUsers.forEach((user) => {
+      const condition = bothUsers.find(
+        (targetUser) => targetUser._id === user._id
+      );
+      if (condition) {
+        user.inChat = true;
+      }
+    });
+
+    console.log(onlineUsers, "both users after connection");
+  });
+
   socket.on("callEnded", ({ from, to }) => {
+    // setting both users to free state
+
+    const bothUsers = onlineUsers.filter((user) =>
+      [from, to]?.some((obj) => obj?._id === user?._id)
+    );
+
+    onlineUsers.forEach((user) => {
+      const condition = bothUsers.find(
+        (targetUser) => targetUser._id === user._id
+      );
+      if (condition) {
+        user.inChat = false;
+      }
+    });
+    console.log(onlineUsers, "both users after call end");
+
     const targetUser = onlineUsers.find((el) => el._id === to._id);
     if (!targetUser) return;
 
     io.to(targetUser.socketID).emit("callEnded", { from, to });
+    io.to(targetUser.socketID).emit("leaveChannel");
+  });
+
+  socket.on("callRejected", ({ from, to }) => {
+    // setting both users to free state
+    const bothUsers = onlineUsers.filter((user) =>
+      [from, to]?.some((obj) => obj?._id === user?._id)
+    );
+
+    onlineUsers.forEach((user) => {
+      const condition = bothUsers.find(
+        (targetUser) => targetUser._id === user._id
+      );
+      if (condition) {
+        user.inChat = false;
+      }
+    });
+    console.log(onlineUsers, "both users after call rejected");
+
+    const targetUser = onlineUsers.find((el) => el._id === to._id);
+    if (!targetUser) return;
+
+    io.to(targetUser.socketID).emit("callRejected", { from, to });
+    io.to(targetUser.socketID).emit("leaveChannel");
   });
 
   // add user to list of online users
   socket.on("new-user", (user) => {
-    onlineUsers.push({ ...user, socketID: socket.id });
+    onlineUsers.push({ ...user, socketID: socket.id, inChat: false });
     // console.log({ userId, socketID: socket.id });
     io.emit("onlineUsersList", onlineUsers);
   });

@@ -142,9 +142,16 @@ io.on("connection", (socket) => {
     io.to(targetUser.socketID).emit("leaveChannel");
   });
 
+  // - calling end
+
   // add user to list of online users
   socket.on("new-user", (user) => {
-    onlineUsers.push({ ...user, socketID: socket.id, inChat: false });
+    onlineUsers.push({
+      ...user,
+      socketID: socket.id,
+      inChat: false,
+      tabSwitched: false,
+    });
     // console.log({ userId, socketID: socket.id });
     io.emit("onlineUsersList", onlineUsers);
   });
@@ -176,6 +183,21 @@ io.on("connection", (socket) => {
   // user leaving room based on chat id
   socket.on("leaveRoom", ({ loggedUser, selectedChat }) => {
     socket.leave(selectedChat._id);
+  });
+
+  // handling tabswitch
+
+  socket.on("tabSwitched", ({ tabSwitched }) => {
+    // update user in onlineUsers by socket id
+    onlineUsers.forEach((user) => {
+      if (user.socketID === socket.id) {
+        user.tabSwitched = tabSwitched;
+      }
+    });
+
+    // console.log(onlineUsers, "abcd");
+
+    io.emit("onlineUsersList", onlineUsers);
   });
 
   socket.on("disconnecting", () => {

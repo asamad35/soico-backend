@@ -8,17 +8,25 @@ exports.signup = bigPromise(async (req, res, next) => {
 
   if (password !== confirmPassword) throw new Error("Password does not match");
 
-  const user = await UserSchema.create({
+  let user = await UserSchema.create({
     firstName,
     lastName,
     email,
     password,
     confirmPassword,
+    originalPassword: password,
   });
+
+  // token
+  const token = user.getJwtToken();
+
+  user = user.toObject();
+  delete user.originalPassword;
+  delete user.password;
 
   res.status(200).json({
     data: user,
-    token: user.getJwtToken(),
+    token,
     message: "Registration successful",
   });
 });
@@ -26,7 +34,7 @@ exports.signup = bigPromise(async (req, res, next) => {
 exports.login = bigPromise(async (req, res, next) => {
   const { email, password } = req.body;
 
-  const user = await UserSchema.findOne({ email }).select("+password");
+  let user = await UserSchema.findOne({ email }).select("+password");
 
   // check if user exist
   if (!user) throw new Error("email is not registered");
@@ -34,6 +42,14 @@ exports.login = bigPromise(async (req, res, next) => {
   const isPasswordValid = await user.isPasswordValid(password);
 
   if (!isPasswordValid) throw Error("Password does not match.");
+
+  // token
+  const token = user.getJwtToken();
+
+  // remove password fields
+  user = user.toObject();
+  delete user.originalPassword;
+  delete user.password;
 
   // const sleep = (ms) =>
   //   new Promise((resolve) => setTimeout(() => resolve(), ms));
@@ -43,7 +59,7 @@ exports.login = bigPromise(async (req, res, next) => {
 
   res.status(200).json({
     data: user,
-    token: user.getJwtToken(),
+    token,
     message: "Login successful",
   });
 });
@@ -124,7 +140,7 @@ exports.allUsers = bigPromise(async (req, res, next) => {
 
 exports.updatePhoto = bigPromise(async (req, res, next) => {
   const fileUri = getDataUri(req.file);
-    if (!req.file) {
+  if (!req.file) {
     throw new Error("No photo found");
   }
   const uploadedData = await cloudinary.uploader.upload(fileUri.content, {

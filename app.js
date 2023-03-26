@@ -1,19 +1,12 @@
 require("dotenv").config();
 const express = require("express");
-const session = require("express-session");
 const app = express();
 const morgan = require("morgan");
 // const fileUpload = require("express-fileupload");
 const cors = require("cors");
 const cloudinary = require("cloudinary").v2;
 
-app.use(
-  session({
-    secret: process.env.SESSIONSECRET,
-    resave: true,
-    saveUninitialized: true,
-  })
-);
+
 // middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

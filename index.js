@@ -2,7 +2,7 @@ require("dotenv").config();
 const app = require("./app");
 const connectWithDb = require("./config");
 connectWithDb();
-
+console.log(process.env.PROD, "aaaaaaaaaaaaaaaaaaaaa");
 // socket
 const http = require("http");
 const server = http.createServer(app);

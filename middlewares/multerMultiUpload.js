@@ -5,6 +5,7 @@ const storage = new GridFsStorage({
   url: process.env.DB_URL,
   options: { useNewUrlParser: true, useUnifiedTopology: true },
   file: (request, file) => {
+    console.log({ file }, "ababababab");
     return {
       bucketName: "docsss",
       filename: `${Date.now()}-file-${file.originalname}`,

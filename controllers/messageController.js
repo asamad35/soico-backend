@@ -26,6 +26,7 @@ exports.sendMessage = bigPromise(async (req, res) => {
 
   if (req.files)
     filesName = req.files.map((el, idx) => {
+      console.log(el, "in files");
       return {
         name: el.originalname,
         uuid: uuids.split(",")[idx],
